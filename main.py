@@ -1,16 +1,18 @@
+"""The main file for the ISM-A2-AttackTree application."""
+
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
-import yaml
 import webbrowser
+import yaml
 
 
 # =================== APP/ROOT SETUP ===================
 root = tk.Tk()
 # sizing and centering of window
-# REF: Multiple Authors (2015). Stack Overflow: "How to center a window on the screen in Tkinter?". Available at: https://stackoverflow.com/questions/3352918/how-to-center-a-window-on-the-screen-in-tkinter [Accessed 05 March 2024]
+# REF: Multiple Authors (2015). Stack Overflow: "How to center a window on the screen in Tkinter?". Available at: https://stackoverflow.com/questions/3352918/how-to-center-a-window-on-the-screen-in-tkinter [Accessed 05 March 2024] # pylint: disable=line-too-long
 APP_WIDTH = 800
-APP_HEIGHT = 800
+APP_HEIGHT = 500
 APP_WIDTH_MIN = 500
 APP_HEIGHT_MIN = 500
 root.eval('tk::PlaceWindow . center')
@@ -18,7 +20,7 @@ screenWidth = root.winfo_screenwidth()
 screenHeight = root.winfo_screenheight()
 xCoord = (screenWidth / 2) - (APP_WIDTH / 2)
 yCoord = (screenHeight / 2) - (APP_HEIGHT / 2)
-root.geometry("{}x{}+{}+{}".format(APP_WIDTH, APP_HEIGHT, int(xCoord), int(yCoord)))
+root.geometry("{}x{}+{}+{}".format(APP_WIDTH, APP_HEIGHT, int(xCoord), int(yCoord)))  # pylint: disable=consider-using-f-string
 root.minsize(APP_WIDTH_MIN, APP_HEIGHT_MIN)
 # other settings
 root.title("ISM-A2-AttackTree")
@@ -27,12 +29,15 @@ root.iconbitmap("icon.ico")
 root.bind("<Escape>", lambda e: root.quit())
 
 
-#region ============================ FUNCTIONS ============================
+# region ============================ FUNCTIONS ============================
 def open_link(url):
+    """Open a link in the default web browser."""
     webbrowser.open_new(url)
 
+
 # set the selected item values in the attack_tree to the entry fields
-def on_select(event):
+def on_select():
+    """Sets the selected item field values when user selects a node in the treeview."""
     selected = attack_tree.focus()
     values = attack_tree.item(selected, "values")
     itemUpdateEntry.delete(0, "end")
@@ -45,6 +50,7 @@ def on_select(event):
 
 # update buttons
 def update_node():
+    """Updates the selected node in the treeview with the values in the entry fields."""
     # get current selected item
     selected = attack_tree.focus()
     # update the selected item
@@ -53,6 +59,7 @@ def update_node():
 
 # delete button
 def delete_node():
+    """Deletes the selected node in the treeview."""
     # get current selected item
     selected = attack_tree.focus()
     # delete the selected item
@@ -61,6 +68,7 @@ def delete_node():
 
 # add button
 def add_node():
+    """Adds a child node to the currently selected node with the values that are currently entered in the entry fields."""
     selected = attack_tree.focus()
     # get the entry values
     item = itemUpdateEntry.get()
@@ -89,7 +97,7 @@ def add_node():
 #     if not parent_id:
 #         # already at root level
 #         return
-    
+
 #     index = tree.index(parent_id)
 #     tree.move(item_id, '', index)
 #     # update children parent_id to match new parents id
@@ -104,7 +112,7 @@ def add_node():
 #     if not previous_sibling_id:
 #         # already at bottom level
 #         return
-    
+
 #     tree.move(item_id, previous_sibling_id, 'end')
 
 
@@ -117,7 +125,9 @@ def add_node():
 
 
 def load_from_yaml():
+    """Load an attack tree from a YAML file."""
     tree = attack_tree
+
     def deserialize_node(data, parent=''):
         for text, node_data in data.items():
             if isinstance(node_data, dict):
@@ -134,38 +144,27 @@ def load_from_yaml():
     # tree.delete(*tree.get_children())
     filename = filedialog.askopenfilename(filetypes=[("YAML files", "*.yaml")])
     if filename:
-        with open(filename, "r") as file:
+        with open(filename, "r", encoding="utf-8") as file:
             data = yaml.safe_load(file)
             deserialize_node(data)
-    
+
     expand_all_nodes()
 
 
-
-def represent_float(dumper, data):
-    if data != data:
-        value = '.nan'
-    elif data == float('inf'):
-        value = '.inf'
-    elif data == float('-inf'):
-        value = '-.inf'
-    else:
-        value = dumper.represent_float(data)
-    return value
-
-
 def save_to_yaml():
+    """Save the attack tree to a YAML file."""
     tree = attack_tree
+
     def serialize_node(tree, node):
         item = tree.item(node)
         text = item['text']
         values = item['values']
         children = tree.get_children(node)
         if children:
-            childrenData = {}
+            children_data = {}
             for child in children:
-                childrenData.update(serialize_node(tree, child))
-            return {text: {'probability': float(values[0]), 'cost': float(values[1]), **childrenData}}
+                children_data.update(serialize_node(tree, child))
+            return {text: {'probability': float(values[0]), 'cost': float(values[1]), **children_data}}
         else:
             return {text: {'probability': float(values[0]), 'cost': float(values[1])}}
 
@@ -177,12 +176,12 @@ def save_to_yaml():
     # open save file dialog
     filename = filedialog.asksaveasfilename(defaultextension=".yaml", filetypes=[("YAML files", "*.yaml")])
     if filename:
-        with open(filename, "w") as file:
-            yaml.add_representer(float, represent_float)
+        with open(filename, "w", encoding="utf-8") as file:
             yaml.dump(data, file, default_flow_style=False, default_style='', sort_keys=True)
 
 
-def calculate_totals(probLabel, costLabel, probAvgLabel, costAvgLabel):
+def calculate_totals(prob_label, cost_label, prob_avg_label, cost_avg_label):
+    """Calculate the total and average probability and cost of the attack tree."""
     tree = attack_tree
     print("calculating totals")
 
@@ -200,18 +199,19 @@ def calculate_totals(probLabel, costLabel, probAvgLabel, costAvgLabel):
                 probability, cost = map(float, values)
                 total_probability += probability
                 total_cost += cost
-            
+
             stack.append(child_id)
             num_nodes += 1
-    
+
     # update the totals labels
-    probLabel.config(text=str("{:.2f}%".format(total_probability)))
-    costLabel.config(text=str("${:.2f}".format(total_cost)))
-    probAvgLabel.config(text=str("{:.2f}%".format(total_probability / num_nodes)))
-    costAvgLabel.config(text=str("${:.2f}".format(total_cost / num_nodes)))
+    prob_label.config(text=str("{:.2f}%".format(total_probability)))  # pylint: disable=consider-using-f-string
+    cost_label.config(text=str("${:.2f}".format(total_cost)))  # pylint: disable=consider-using-f-string
+    prob_avg_label.config(text=str("{:.2f}%".format(total_probability / num_nodes)))  # pylint: disable=consider-using-f-string
+    cost_avg_label.config(text=str("${:.2f}".format(total_cost / num_nodes)))  # pylint: disable=consider-using-f-string
 
 
 def expand_all_nodes(item_id=''):
+    """Expands all nodes in the treeview."""
     tree = attack_tree
     children = tree.get_children(item_id)
     for child in children:
@@ -220,14 +220,14 @@ def expand_all_nodes(item_id=''):
 
 
 def collapse_all_nodes(item_id=''):
+    """Collapses all nodes in the treeview."""
     tree = attack_tree
     children = tree.get_children(item_id)
     for child in children:
         tree.item(child, open=False)
         collapse_all_nodes(child)
 
-
-#endregion ============================ END FUNCTIONS ============================
+# endregion ============================ END FUNCTIONS ============================
 
 
 # =================== HEADER ===================
@@ -255,7 +255,7 @@ at_scroll.pack(side="right", fill="y")
 attack_tree.configure(yscrollcommand=at_scroll.set)
 
 
-# =================== TEST DATA SEED =================== 
+# =================== TEST DATA SEED ===================
 attack_tree.insert("", "end", "node1", text="Node 1", values=(63, 45))
 attack_tree.insert("node1", "end", "node1.1", text="Node 1.1", values=(0.69, 3535))
 attack_tree.insert("node1", "end", "node1.2", text="Node 1.2", values=(63, 102550))
@@ -340,8 +340,10 @@ attack_tree.bind("<<TreeviewSelect>>", on_select)
 
 # ============================ MAIN ============================
 def main():
+    """The main function for the ISM-A2-AttackTree application."""
     # run app
     root.mainloop()
+
 
 if __name__ == "__main__":
     main()

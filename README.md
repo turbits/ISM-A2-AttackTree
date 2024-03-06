@@ -1,8 +1,15 @@
-<div style="text-align:center">
-    <h1>Python Attack Tree Visualizer</h1>
+# ISM_PCOM7E Assignment 2 - Python Attack Tree Visualizer
+
+<p align="center">
     <img src="icon.png" alt="icon" width="100" style="image-rendering:pixelated"/>
-    <p style="font-size: 12px;font-style:italic">Icon for fun because you can use one in tkinter 🙉</p>
-</div>
+</p>
+
+<p align="center">
+    Icon for fun because you can use one in tkinter 🙉
+</p>
+
+by Trevor Woodman / @turbits
+
 
 ## Some feature notes:
 - the program does not support multiple selection node actions

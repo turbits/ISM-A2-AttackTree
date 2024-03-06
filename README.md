@@ -9,7 +9,12 @@
 - the value display is a bit rough and could be improved to show $ or % on values
 - nodes can't have the same name at the same level. e.g., from the test attack tree file, "Node 1" at root can't have a sibling called "Node 1"
 
-The program is a functional attack tree visualizer that can be used to visualize attack trees in...you guessed it...a tree-like structure. I have used `tkinter` and `pyyaml` to create a GUI and to load/save attack tree files as YAML. The program is also capable of adding, deleting, and updating nodes in the tree via the GUI. 
+The program is a functional attack tree visualizer that can be used to visualize attack trees in...you guessed it...a tree-like structure. I have used `tkinter` and `pyyaml` to create this program. Some features:
+- a GUI using tkinter and treeview
+- ability to load and save YAML files, see below or example YAML files for structure
+- ability to add, delete, and update nodes in the tree via the GUI
+- calculate totals and averages for the entire tree
+- expand and collapse all nodes
 
 
 # Operation

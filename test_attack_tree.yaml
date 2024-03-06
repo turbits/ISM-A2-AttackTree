@@ -1,0 +1,21 @@
+Node 1:
+  Node 1.1:
+    Node 1.1.1:
+      cost: 100.0
+      probability: 0.9
+    Node 1.1.2:
+      cost: 100.0
+      probability: 23.59
+    cost: 100.0
+    probability: 0.69
+  Node 1.2:
+    Node 1.2.1:
+      cost: 100.0
+      probability: 90.99
+    Node 1.2.2:
+      cost: 100.0
+      probability: 63.0
+    cost: 100.0
+    probability: 63.0
+  cost: 100.0
+  probability: 63.0

@@ -270,7 +270,7 @@ def calculate_rating(probability_avg, cost_avg):
 
 
 # =================== HEADER ===================
-label = tk.Label(root, text="Attack Tree", font=("Arial", 20, "bold"))
+label = tk.Label(root, text="Attack Tree Visualizer", font=("Arial", 20, "bold"))
 label.pack(side="top", fill="x")
 label_sub = tk.Label(root, text="Information Security Management - Assignment 2", font=("Arial", 10))
 label_sub.pack(side="top", fill="x")

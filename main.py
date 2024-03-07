@@ -404,7 +404,7 @@ calculate_totals_button.grid(row=7, column=0, columnspan=4, sticky="ew")
 
 # ============================ EVENT BINDING/MISC ============================
 # when the user selects something in the treeview, it will run the on_select function (sets the entry fields to the selected item values)
-attack_tree.bind("<<TreeviewSelect>>", lambda: on_select)
+attack_tree.bind("<<TreeviewSelect>>", lambda e: on_select())
 
 
 # ============================ MAIN ============================

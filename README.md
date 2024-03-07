@@ -1,5 +1,7 @@
 # ISM_PCOM7E Assignment 2 - Python Attack Tree Visualizer
 
+**As this is submitted as was requested via a zip file, the GitHub repository may be easier to navigate: [https://github.com/turbits/ISM-A2-AttackTree](https://github.com/turbits/ISM-A2-AttackTree)**
+
 <p align="center">
     <img src="icon.png" alt="icon" width="100" style="image-rendering:pixelated"/>
 </p>

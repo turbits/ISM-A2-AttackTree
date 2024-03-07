@@ -242,17 +242,17 @@ def calculate_rating(probability_avg, cost_avg):
     rating_letter = 'X'
     if rating_raw >= 0:
         rating_letter = 'AA'
-    elif rating_raw >= 1500:
+    elif rating_raw >= 500:
         rating_letter = 'A'
-    elif rating_raw <= 3000:
+    elif rating_raw <= 1000:
         rating_letter = 'B'
-    elif rating_raw >= 6000:
+    elif rating_raw >= 1500:
         rating_letter = 'C'
-    elif rating_raw >= 20000:
+    elif rating_raw >= 2500:
         rating_letter = 'D'
-    elif rating_raw >= 50000:
+    elif rating_raw >= 4000:
         rating_letter = 'E'
-    elif rating_raw >= 100000:
+    elif rating_raw >= 8000:
         rating_letter = 'F'
     return rating_letter, rating_raw
 

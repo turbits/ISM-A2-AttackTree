@@ -332,39 +332,39 @@ cost_update_entry_field.grid(row=2, column=1)
 statsFrame = tk.Frame(bottom_right_frame)
 statsFrame.pack(fill="both")
 
-rating_label = tk.Label(statsFrame, text="Rating:")
+rating_label = tk.Label(statsFrame, text="Rating:", font=("Arial", 12, "bold"))
 rating_label.grid(row=1, column=0)
-rating_value = tk.Label(statsFrame, text="0")
+rating_value = tk.Label(statsFrame, text="0", font=("Arial", 12, "bold"))
 rating_value.grid(row=1, column=1)
 
 rating_label_raw = tk.Label(statsFrame, text="Rating (Raw):")
-rating_label_raw.grid(row=1, column=2)
+rating_label_raw.grid(row=2, column=0)
 rating_value_raw = tk.Label(statsFrame, text="0")
-rating_value_raw.grid(row=1, column=3)
+rating_value_raw.grid(row=2, column=1)
 
 average_probability_label = tk.Label(statsFrame, text="Average Probability:")
-average_probability_label.grid(row=2, column=0)
+average_probability_label.grid(row=3, column=0)
 average_probability_value = tk.Label(statsFrame, text="0")
-average_probability_value.grid(row=2, column=1)
+average_probability_value.grid(row=3, column=1)
 
 average_cost_label = tk.Label(statsFrame, text="Average Cost:")
-average_cost_label.grid(row=3, column=0)
+average_cost_label.grid(row=4, column=0)
 average_cost_value = tk.Label(statsFrame, text="0")
-average_cost_value.grid(row=3, column=1)
+average_cost_value.grid(row=4, column=1)
 
 total_probability_label = tk.Label(statsFrame, text="Total Probability:")
-total_probability_label.grid(row=4, column=0)
+total_probability_label.grid(row=5, column=0)
 total_probability_value = tk.Label(statsFrame, text="0")
-total_probability_value.grid(row=4, column=1)
+total_probability_value.grid(row=5, column=1)
 
 total_cost_label = tk.Label(statsFrame, text="Total Cost:")
-total_cost_label.grid(row=5, column=0)
+total_cost_label.grid(row=6, column=0)
 total_cost_value = tk.Label(statsFrame, text="0")
-total_cost_value.grid(row=5, column=1)
+total_cost_value.grid(row=6, column=1)
 
 # calculate totals button
 calculate_totals_button = tk.Button(statsFrame, text="Calculate Totals", command=calculate_totals(rating_value, rating_value_raw, total_probability_value, total_cost_value, average_probability_value, average_cost_value))
-calculate_totals_button.grid(row=6, column=0, columnspan=4, sticky="ew")
+calculate_totals_button.grid(row=7, column=0, columnspan=4, sticky="ew")
 
 # ============================ BUTTONS ============================
 # set up buttons

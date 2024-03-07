@@ -38,7 +38,7 @@ python main.py
 # Operation
 ![main window](images/main-window.png)
 
-The main window of the program is shown above. The software consists of a treeview, buttons to interact with the treeview nodes, and the totals and averages of the tree node "probability" and "cost" values.
+The main window of the program is shown above. The software consists of a treeview, buttons to interact with the treeview nodes, and the totals and averages of the tree node "probability" and "cost" values. For fun, I've included a rating system that is entirely arbitrary.
 
 
 ## Updating Nodes
@@ -68,7 +68,7 @@ These keys can be in any order, as long as the "cost" and "probability" keys are
 
 ## Other Features
 The Calculate Totals button updates the totals and averages of the tree nodes for the "probability" and "cost" values.
-The user can also expand and collapse all nodes in the tree with the Expand All and Collapse All buttons.
+The user can also expand and collapse all nodes in the tree with the `Expand All Nodes` and `Collapse All Nodes` buttons, or delete the entire tree with the `Delete Tree` button.
 
 
 ## Software Issues and Limitations

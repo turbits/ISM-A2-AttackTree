@@ -183,13 +183,13 @@ def save_to_yaml():
             yaml.dump(data, file, default_flow_style=False, default_style='', sort_keys=True)
 
 
-def calculate_totals(_rating_value, _rating_value_raw, prob_value, cost_value, prob_avg_value, cost_avg_value):  # pylint: disable=too-many-locals
+def calculate_totals(tree, _rating_value, _rating_value_raw, prob_value, cost_value, prob_avg_value, cost_avg_value):  # pylint: disable=too-many-locals
     """Calculate the total and average probability and cost of the attack tree."""
-    tree = attack_tree
-
     num_nodes = 0
     total_probability = 0
     total_cost = 0
+    avg_probability = 0
+    avg_cost = 0
     stack = ['']
 
     while stack:
@@ -204,6 +204,11 @@ def calculate_totals(_rating_value, _rating_value_raw, prob_value, cost_value, p
 
             stack.append(child_id)
             num_nodes += 1
+
+    print(f"Number of Nodes: {num_nodes}")
+
+    if num_nodes == 0:
+        return
 
     avg_probability = total_probability / num_nodes
     avg_cost = total_cost / num_nodes
@@ -285,14 +290,14 @@ attack_tree.configure(yscrollcommand=at_scroll.set)
 
 
 # =================== TEST DATA SEED ===================
-attack_tree.insert("", "end", "node1", text="Node 1", values=(63, 45))
-attack_tree.insert("node1", "end", "node1.1", text="Node 1.1", values=(0.69, 3535))
-attack_tree.insert("node1", "end", "node1.2", text="Node 1.2", values=(63, 102550))
-attack_tree.insert("node1.1", "end", "node1.1.1", text="Node 1.1.1", values=(0.9, 567777))
-attack_tree.insert("node1.1", "end", "node1.1.2", text="Node 1.1.2", values=(23.59, 1))
-attack_tree.insert("node1.2", "end", "node1.2.1", text="Node 1.2.1", values=(90.99, 10140))
-attack_tree.insert("node1.2", "end", "node1.2.2", text="Node 1.2.2", values=(63, 10560))
-expand_all_nodes()
+# attack_tree.insert("", "end", "node1", text="Node 1", values=(63, 45))
+# attack_tree.insert("node1", "end", "node1.1", text="Node 1.1", values=(0.69, 3535))
+# attack_tree.insert("node1", "end", "node1.2", text="Node 1.2", values=(63, 102550))
+# attack_tree.insert("node1.1", "end", "node1.1.1", text="Node 1.1.1", values=(0.9, 567777))
+# attack_tree.insert("node1.1", "end", "node1.1.2", text="Node 1.1.2", values=(23.59, 1))
+# attack_tree.insert("node1.2", "end", "node1.2.1", text="Node 1.2.1", values=(90.99, 10140))
+# attack_tree.insert("node1.2", "end", "node1.2.2", text="Node 1.2.2", values=(63, 10560))
+# expand_all_nodes()
 
 
 # =================== BOTTOM SECTION ===================
@@ -334,7 +339,7 @@ statsFrame.pack(fill="both")
 
 rating_label = tk.Label(statsFrame, text="Rating:", font=("Arial", 12, "bold"))
 rating_label.grid(row=1, column=0)
-rating_value = tk.Label(statsFrame, text="0", font=("Arial", 12, "bold"))
+rating_value = tk.Label(statsFrame, text="X", font=("Arial", 12, "bold"))
 rating_value.grid(row=1, column=1)
 
 rating_label_raw = tk.Label(statsFrame, text="Rating (Raw):")
@@ -363,7 +368,7 @@ total_cost_value = tk.Label(statsFrame, text="0")
 total_cost_value.grid(row=6, column=1)
 
 # calculate totals button
-calculate_totals_button = tk.Button(statsFrame, text="Calculate Totals", command=calculate_totals(rating_value, rating_value_raw, total_probability_value, total_cost_value, average_probability_value, average_cost_value))
+calculate_totals_button = tk.Button(statsFrame, text="Calculate Totals", command=lambda: calculate_totals(attack_tree, rating_value, rating_value_raw, total_probability_value, total_cost_value, average_probability_value, average_cost_value))
 calculate_totals_button.grid(row=7, column=0, columnspan=4, sticky="ew")
 
 # ============================ BUTTONS ============================
@@ -389,7 +394,7 @@ collapse_all_nodes_button.grid(row=1, column=3, sticky="ew")
 
 # ============================ EVENT BINDING/MISC ============================
 # when the user selects something in the treeview, it will run the on_select function (sets the entry fields to the selected item values)
-attack_tree.bind("<<TreeviewSelect>>", on_select)
+attack_tree.bind("<<TreeviewSelect>>", lambda: on_select)
 
 
 # ============================ MAIN ============================

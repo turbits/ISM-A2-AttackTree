@@ -205,8 +205,6 @@ def calculate_totals(tree, _rating_value, _rating_value_raw, prob_value, cost_va
             stack.append(child_id)
             num_nodes += 1
 
-    print(f"Number of Nodes: {num_nodes}")
-
     if num_nodes == 0:
         return
 
@@ -239,6 +237,13 @@ def collapse_all_nodes(item_id=''):
     for child in children:
         tree.item(child, open=False)
         collapse_all_nodes(child)
+
+
+# delete all nodes function with confirmation dialog box
+def delete_all_nodes():
+    """Deletes all nodes in the treeview with a confirmation dialog box."""
+    if tk.messagebox.askyesno("Delete the entire tree", "Are you sure you want to delete all nodes in this tree (IRREVERSIBLE)?"):
+        attack_tree.delete(*attack_tree.get_children(''))
 
 
 def calculate_rating(probability_avg, cost_avg):
@@ -332,6 +337,31 @@ cost_update_label.grid(row=2, column=0)
 cost_update_entry_field = tk.Entry(update_records_frame)
 cost_update_entry_field.grid(row=2, column=1)
 
+# update records section buttons
+add_button = tk.Button(update_records_button_frame, text="Add Node", command=add_node)
+add_button.grid(row=0, column=0, sticky="ew")
+
+update_button = tk.Button(update_records_button_frame, text="Update Node", command=update_node)
+update_button.grid(row=1, column=0, sticky="ew")
+
+delete_button = tk.Button(update_records_button_frame, text="Delete Node", command=delete_node)
+delete_button.grid(row=2, column=0, sticky="ew")
+
+save_tree_button = tk.Button(update_records_button_frame, text="Save Tree", command=save_to_yaml)
+save_tree_button.grid(row=0, column=1, sticky="ew")
+
+load_tree_button = tk.Button(update_records_button_frame, text="Load Tree", command=load_from_yaml)
+load_tree_button.grid(row=1, column=1, sticky="ew")
+
+expand_all_nodes_button = tk.Button(update_records_button_frame, text="Expand All", command=expand_all_nodes)
+expand_all_nodes_button.grid(row=0, column=3, sticky="ew")
+
+collapse_all_nodes_button = tk.Button(update_records_button_frame, text="Collapse All", command=collapse_all_nodes)
+collapse_all_nodes_button.grid(row=1, column=3, sticky="ew")
+
+delete_all_nodes_button = tk.Button(update_records_button_frame, text="Delete Tree⚠️", command=delete_all_nodes)
+delete_all_nodes_button.grid(row=2, column=3, sticky="ew")
+
 
 # =================== STATS AND RESULTS SECTION ===================
 statsFrame = tk.Frame(bottom_right_frame)
@@ -367,29 +397,9 @@ total_cost_label.grid(row=6, column=0)
 total_cost_value = tk.Label(statsFrame, text="0")
 total_cost_value.grid(row=6, column=1)
 
-# calculate totals button
+# stats section buttons
 calculate_totals_button = tk.Button(statsFrame, text="Calculate Totals", command=lambda: calculate_totals(attack_tree, rating_value, rating_value_raw, total_probability_value, total_cost_value, average_probability_value, average_cost_value))
 calculate_totals_button.grid(row=7, column=0, columnspan=4, sticky="ew")
-
-# ============================ BUTTONS ============================
-# set up buttons
-add_button = tk.Button(update_records_button_frame, text="Add", command=add_node)
-add_button.grid(row=0, column=2, sticky="ew")
-update_button = tk.Button(update_records_button_frame, text="Update", command=update_node)
-update_button.grid(row=0, column=0, sticky="ew")
-delete_button = tk.Button(update_records_button_frame, text="Delete", command=delete_node)
-delete_button.grid(row=0, column=1, sticky="ew")
-load_button = tk.Button(update_records_button_frame, text="Load", command=load_from_yaml)
-load_button.grid(row=1, column=0, sticky="ew")
-save_button = tk.Button(update_records_button_frame, text="Save", command=save_to_yaml)
-save_button.grid(row=1, column=1, sticky="ew")
-
-# expand all nodes button
-expand_all_nodes_button = tk.Button(update_records_button_frame, text="Expand All", command=expand_all_nodes)
-expand_all_nodes_button.grid(row=0, column=3, sticky="ew")
-# collapse all nodes button
-collapse_all_nodes_button = tk.Button(update_records_button_frame, text="Collapse All", command=collapse_all_nodes)
-collapse_all_nodes_button.grid(row=1, column=3, sticky="ew")
 
 
 # ============================ EVENT BINDING/MISC ============================

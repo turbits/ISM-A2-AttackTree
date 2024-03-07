@@ -1,0 +1,15 @@
+Information Loss:
+  Customer or Business Information:
+    cost: 5000.0
+    probability: 10.0
+  Employee Information:
+    cost: 10000.0
+    probability: 5.0
+  cost: 0.0
+  probability: 0.0
+Customer Funds:
+  cost: 100000.0
+  probability: 5.0
+Networked Business Devices:
+  cost: 30000.0
+  probability: 25.0

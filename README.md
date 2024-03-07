@@ -36,13 +36,15 @@ python main.py
 ```
 
 # Operation
-![Main window](image.png)
+![main window](images/main-window.png)
 
 The main window of the program is shown above. The software consists of a treeview, buttons to interact with the treeview nodes, and the totals and averages of the tree node "probability" and "cost" values.
 
 
 ## Updating Nodes
 The node interaction buttons are along the top row of buttons from left to right: Update, Delete, and Add. These three buttons allow the user to change or delete the selected node, and add a new node to the tree as a child of the selected node. When selecting a node in the tree, the Item, Probability, and Cost entry fields will be populated with the values of the selected node. The user can then update the node with new values if they wish.
+
+![updating node](images/update-node.png)
 
 
 ## Loading and Saving Attack Tree Files
@@ -70,6 +72,7 @@ The user can also expand and collapse all nodes in the tree with the Expand All 
 
 
 ## Software Issues and Limitations
+- The averages are totally broken because of the way the tree gets populated/recursively parsed, please pretend they are correct :^)
 - Does not support multiple selection node actions.
 - The value display is a bit rough and could be improved to show $ or % on values.
 - Nodes can't have the same name at the same level. e.g., from the test attack tree file, "Node 1" at root can't have a sibling called "Node 1".
@@ -80,17 +83,58 @@ The user can also expand and collapse all nodes in the tree with the Expand All 
 
 
 # Pampered Pets Pre and Post-Digitalization Attack Trees
-The following are the attack trees for the Pampered Pets company, pre and post-digitalization. The attack trees are roughly based on my previous assignment [Assignment 1 - Repo](https://github.com/turbits/essex_eportfolio/tree/main/pages/module7/assignment1)/[Assignment 1 - ePortfolio](https://essex.trevorwoodman.ca/pages/module7/assignment1/m7a1.html), but have been modified to fit the requirements of the software and of the assignment.
+The following are the attack trees for the Pampered Pets company, pre and post-digitalization. The attack trees are roughly based on my previous assignment [Assignment 1 - Repo](https://github.com/turbits/essex_eportfolio/tree/main/pages/module7/assignment1)/[Assignment 1 - ePortfolio](https://essex.trevorwoodman.ca/pages/module7/assignment1/m7a1.html), but have been modified to fit the requirements of the software and of the assignment. The numbers used here are arbitrary.
 
 
 ## Pre-Digitalization Attack Tree
 ```yaml
+Information Loss:
+  Customer or Business Information:
+    cost: 5000.0
+    probability: 10.0
+  Employee Information:
+    cost: 10000.0
+    probability: 5.0
+  cost: 0.0
+  probability: 0.0
+Customer Funds:
+  cost: 100000.0
+  probability: 5.0
+Networked Business Devices:
+  cost: 30000.0
+  probability: 25.0
 ```
+![pre-digital attack tree](images/pre-dig-at.png)
+
 
 
 ## Post-Digitalization Attack Tree
 ```yaml
+Website Storefront:
+  cost: 15000.0
+  probability: 15.0
+Updated ERP Systems:
+  cost: 100000.0
+  probability: 10.0
 ```
+
+![post-digital attack tree](images/post-dig-at.png)
+
+
+# Rating
+The rating system I built into the software is absolutely arbitrary and I made the entire thing up while I was writing the `calculate_rating` function. It is based on the probability average and the cost average summed and divided by 100. The resulting number is then rounded up and run through a cascade of if statements to determine the "letter rating", which I thought would look nicer and be more readable than a number. The rating system (again, extremely arbitrary), is as follows:
+
+| Raw Rating | Letter Rating |
+|------------|---------------|
+| 0 - 499   | AA            |
+| 500 - 999 | A             |
+| 1000 - 1499 | B             |
+| 1500 - 2499 | C             |
+| 2500 - 3999 | D             |
+| 4000 - 7999 | E             |
+| 8000+    | F             |
+
+This may or may not produce results that are useful or meaningful, but it was a fun little thing to implement and could be expanded upon to be more useful and perhaps align with real-world risk rating systems.
 
 
 # Testing and Linting
@@ -110,7 +154,15 @@ I originally did not use linting, but have since added the `flake8` extension to
 
 After, I installed `Pylint` as well and had 38 warnings and informationals. These were unused arguments, missing docstrings, import orderering, lines that were too long, etc. I have screenshotted and included below. I disabled some pylint warnings that I felt were not necessary to fix. I typically spend quite a bit of time using PowerShell and C#, so my variables were mostly using camel and pascal case, I did change these over to snake case to satisfy the linter and the Python style guide.
 
-![pylint lint warnings and informationals](image-1.png)
+![pylint lint warnings and informationals](images/pylint-out.png)
+
+Personally I think the Python style guide and therefore linters are a bit too opinionated, but I also understand the value of having a consistent style across a codebase. Unfortunately, sometimes the linter has me making changes that break things, such as not passing an event argument into a function that is bound to the treeview select event:
+```python
+def on_select(event=None):  # <- event arg
+    # [...]
+```
+
+Pylint flagged this as an unused argument and myself not knowing enough about tkinter removed it as part of the other lint changes I made. I was of course then confused as to why the function started throwing errors. Once I did a bit of research, I quickly found that the event argument is required for the function to work, but it was still not a great experience. This is a bit of a tangent, but I think it is important to note that linters can sometimes be a bit too opinionated and can cause issues for developers who are not so familiar with the language or the libraries they are using.
 
 
 # References
@@ -118,3 +170,4 @@ After, I installed `Pylint` as well and had 38 warnings and informationals. Thes
 - PyYAML. (N.D) PyYAML Website. Available at: https://pyyaml.org/ [Accessed 05 March 2024]
 - Multiple Authors (2015). Stack Overflow: "How to center a window on the screen in Tkinter?". Available at: https://stackoverflow.com/questions/3352918/how-to-center-a-window-on-the-screen-in-tkinter [Accessed 05 March 2024]
 - Elder, J. (N.D). Codemy.com YouTube Channel: Multiple videos on Python and Tkinter. Available at: https://www.youtube.com/watch?v=tvXFpMGlHPk [Accessed 05 March 2024]
+- Multiple Authors (2010). Stack Overflow: "Tkinter button command activates upon running program?". Available at: https://stackoverflow.com/questions/3704568/tkinter-button-command-activates-upon-running-program [Accessed 06 Mar 2024]

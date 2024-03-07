@@ -4,6 +4,7 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
 import webbrowser
+import math
 import yaml
 
 
@@ -36,16 +37,16 @@ def open_link(url):
 
 
 # set the selected item values in the attack_tree to the entry fields
-def on_select():
+def on_select(event=None):  # pylint: disable=unused-argument
     """Sets the selected item field values when user selects a node in the treeview."""
     selected = attack_tree.focus()
     values = attack_tree.item(selected, "values")
-    itemUpdateEntry.delete(0, "end")
-    probabilityUpdateEntry.delete(0, "end")
-    costUpdateEntry.delete(0, "end")
-    itemUpdateEntry.insert(0, attack_tree.item(selected, "text"))
-    probabilityUpdateEntry.insert(0, values[0])
-    costUpdateEntry.insert(0, values[1])
+    item_update_entry_field.delete(0, "end")
+    probability_update_entry_field.delete(0, "end")
+    cost_update_entry_field.delete(0, "end")
+    item_update_entry_field.insert(0, attack_tree.item(selected, "text"))
+    probability_update_entry_field.insert(0, values[0])
+    cost_update_entry_field.insert(0, values[1])
 
 
 # update buttons
@@ -54,7 +55,7 @@ def update_node():
     # get current selected item
     selected = attack_tree.focus()
     # update the selected item
-    attack_tree.item(selected, text=itemUpdateEntry.get(), values=(probabilityUpdateEntry.get(), costUpdateEntry.get()))
+    attack_tree.item(selected, text=item_update_entry_field.get(), values=(probability_update_entry_field.get(), cost_update_entry_field.get()))
 
 
 # delete button
@@ -71,9 +72,9 @@ def add_node():
     """Adds a child node to the currently selected node with the values that are currently entered in the entry fields."""
     selected = attack_tree.focus()
     # get the entry values
-    item = itemUpdateEntry.get()
-    probability = probabilityUpdateEntry.get()
-    cost = costUpdateEntry.get()
+    item = item_update_entry_field.get()
+    probability = probability_update_entry_field.get()
+    cost = cost_update_entry_field.get()
 
     if item == "" or probability == "" or cost == "":
         return
@@ -81,9 +82,9 @@ def add_node():
     if selected:
         attack_tree.insert(selected, "end", item, text=item, values=(probability, cost))
         # clear the entry fields (commented this out, kinda annoying)
-        # itemUpdateEntry.delete(0, "end")
-        # probabilityUpdateEntry.delete(0, "end")
-        # costUpdateEntry.delete(0, "end")
+        # item_update_entry_field.delete(0, "end")
+        # probability_update_entry_field.delete(0, "end")
+        # cost_update_entry_field.delete(0, "end")
         # expand the selected node to show the new item
         attack_tree.item(selected, open=True)
     else:
@@ -91,6 +92,8 @@ def add_node():
 
 
 # ============================ [UNIMPLEMENTED] PROMOTE/DEMOTE ============================
+# This was sort of working but was more confusing than helpful, so I removed the associated buttons and obviously commented this block out. This is just for reference.
+# ============================
 # def promote_node(item_id):
 #     tree = attack_tree
 #     parent_id = tree.parent(item_id)
@@ -180,10 +183,9 @@ def save_to_yaml():
             yaml.dump(data, file, default_flow_style=False, default_style='', sort_keys=True)
 
 
-def calculate_totals(prob_label, cost_label, prob_avg_label, cost_avg_label):
+def calculate_totals(_rating_value, _rating_value_raw, prob_value, cost_value, prob_avg_value, cost_avg_value):  # pylint: disable=too-many-locals
     """Calculate the total and average probability and cost of the attack tree."""
     tree = attack_tree
-    print("calculating totals")
 
     num_nodes = 0
     total_probability = 0
@@ -203,11 +205,17 @@ def calculate_totals(prob_label, cost_label, prob_avg_label, cost_avg_label):
             stack.append(child_id)
             num_nodes += 1
 
+    avg_probability = total_probability / num_nodes
+    avg_cost = total_cost / num_nodes
+    rating_letter, rating_raw = calculate_rating(avg_probability, avg_cost)
+
     # update the totals labels
-    prob_label.config(text=str("{:.2f}%".format(total_probability)))  # pylint: disable=consider-using-f-string
-    cost_label.config(text=str("${:.2f}".format(total_cost)))  # pylint: disable=consider-using-f-string
-    prob_avg_label.config(text=str("{:.2f}%".format(total_probability / num_nodes)))  # pylint: disable=consider-using-f-string
-    cost_avg_label.config(text=str("${:.2f}".format(total_cost / num_nodes)))  # pylint: disable=consider-using-f-string
+    prob_value.config(text=str("{:.2f}%".format(total_probability)))  # pylint: disable=consider-using-f-string
+    cost_value.config(text=str("${:.2f}".format(total_cost)))  # pylint: disable=consider-using-f-string
+    prob_avg_value.config(text=str("{:.2f}%".format(avg_probability)))  # pylint: disable=consider-using-f-string
+    cost_avg_value.config(text=str("${:.2f}".format(avg_cost)))  # pylint: disable=consider-using-f-string
+    _rating_value.config(text=str(rating_letter))
+    _rating_value_raw.config(text=str(rating_raw))
 
 
 def expand_all_nodes(item_id=''):
@@ -227,19 +235,40 @@ def collapse_all_nodes(item_id=''):
         tree.item(child, open=False)
         collapse_all_nodes(child)
 
+
+def calculate_rating(probability_avg, cost_avg):
+    """Calculate totally arbitrary rating of the attack tree based on the sum of the average probability and cost divided by 100."""
+    rating_raw = math.ceil(probability_avg + cost_avg / 100)
+    rating_letter = 'X'
+    if rating_raw >= 0:
+        rating_letter = 'AA'
+    elif rating_raw >= 1500:
+        rating_letter = 'A'
+    elif rating_raw <= 3000:
+        rating_letter = 'B'
+    elif rating_raw >= 6000:
+        rating_letter = 'C'
+    elif rating_raw >= 20000:
+        rating_letter = 'D'
+    elif rating_raw >= 50000:
+        rating_letter = 'E'
+    elif rating_raw >= 100000:
+        rating_letter = 'F'
+    return rating_letter, rating_raw
+
 # endregion ============================ END FUNCTIONS ============================
 
 
 # =================== HEADER ===================
 label = tk.Label(root, text="Attack Tree", font=("Arial", 20, "bold"))
 label.pack(side="top", fill="x")
-labelSub = tk.Label(root, text="Information Security Management - Assignment 2", font=("Arial", 10))
-labelSub.pack(side="top", fill="x")
-labelAuthor = tk.Label(root, text="Trevor Woodman", font=("Arial", 10))
-labelAuthor.pack(side="top", fill="x")
-labelAuthor2 = tk.Label(root, text="https://github.com/turbits/ISM-A2-AttackTree", fg="#4e757a", font=("Arial", 10), cursor="hand2")
-labelAuthor2.pack(side="top")
-labelAuthor2.bind("<Button-1>", lambda e: open_link("https://github.com/turbits/ISM-A2-AttackTree"))
+label_sub = tk.Label(root, text="Information Security Management - Assignment 2", font=("Arial", 10))
+label_sub.pack(side="top", fill="x")
+label_author = tk.Label(root, text="Trevor Woodman", font=("Arial", 10))
+label_author.pack(side="top", fill="x")
+label_author_sub = tk.Label(root, text="https://github.com/turbits/ISM-A2-AttackTree", fg="#4e757a", font=("Arial", 10), cursor="hand2")
+label_author_sub.pack(side="top")
+label_author_sub.bind("<Button-1>", lambda e: open_link("https://github.com/turbits/ISM-A2-AttackTree"))
 
 
 # =================== TREEVIEW SETUP ===================
@@ -265,72 +294,97 @@ attack_tree.insert("node1.2", "end", "node1.2.1", text="Node 1.2.1", values=(90.
 attack_tree.insert("node1.2", "end", "node1.2.2", text="Node 1.2.2", values=(63, 10560))
 expand_all_nodes()
 
+
+# =================== BOTTOM SECTION ===================
+bottom_frame = tk.Frame(root)
+bottom_frame.pack(side="bottom", pady=20, fill="both")
+bottom_left_frame = tk.Frame(bottom_frame)
+bottom_left_frame.pack(side="left", padx=20, fill="both")
+bottom_right_frame = tk.Frame(bottom_frame)
+bottom_right_frame.pack(side="right", padx=20, fill="both")
+
+
 # =================== UPDATE RECORDS SECTION ===================
 # set up of update records section
-updateRecordsFrame = tk.Frame(root)
-updateRecordsFrame.pack(side="bottom", fill="x")
-updateRecordsButtonsFrame = tk.Frame(root)
-updateRecordsButtonsFrame.pack(side="bottom", fill="x")
+update_records_frame = tk.Frame(bottom_left_frame)
+update_records_frame.pack(side="bottom", fill="x")
+update_records_button_frame = tk.Frame(bottom_left_frame)
+update_records_button_frame.pack(side="top", fill="x", anchor="w")
 
 # update section labels and entry fields
-itemUpdateLabel = tk.Label(updateRecordsFrame, text="Item:")
-itemUpdateLabel.grid(row=0, column=0)
-itemUpdateEntry = tk.Entry(updateRecordsFrame)
-itemUpdateEntry.grid(row=0, column=1)
+item_update_label = tk.Label(update_records_frame, text="Item:")
+item_update_label.grid(row=0, column=0)
+item_update_entry_field = tk.Entry(update_records_frame)
+item_update_entry_field.grid(row=0, column=1)
 
-probabilityUpdateLabel = tk.Label(updateRecordsFrame, text="Probability:")
-probabilityUpdateLabel.grid(row=1, column=0)
-probabilityUpdateEntry = tk.Entry(updateRecordsFrame)
-probabilityUpdateEntry.grid(row=1, column=1)
+probability_update_label = tk.Label(update_records_frame, text="Probability:")
+probability_update_label.grid(row=1, column=0)
+probability_update_entry_field = tk.Entry(update_records_frame)
+probability_update_entry_field.grid(row=1, column=1)
 
-costUpdateLabel = tk.Label(updateRecordsFrame, text="Cost:")
-costUpdateLabel.grid(row=2, column=0)
-costUpdateEntry = tk.Entry(updateRecordsFrame)
-costUpdateEntry.grid(row=2, column=1)
+cost_update_label = tk.Label(update_records_frame, text="Cost:")
+cost_update_label.grid(row=2, column=0)
+cost_update_entry_field = tk.Entry(update_records_frame)
+cost_update_entry_field.grid(row=2, column=1)
 
-# calculate totals labels
-totalProbabilityLabel = tk.Label(updateRecordsFrame, text="Total Probability:")
-totalProbabilityLabel.grid(row=3, column=0)
-totalProbabilityValue = tk.Label(updateRecordsFrame, text="0")
-totalProbabilityValue.grid(row=3, column=1)
 
-totalCostLabel = tk.Label(updateRecordsFrame, text="Total Cost:")
-totalCostLabel.grid(row=4, column=0)
-totalCostValue = tk.Label(updateRecordsFrame, text="0")
-totalCostValue.grid(row=4, column=1)
+# =================== STATS AND RESULTS SECTION ===================
+statsFrame = tk.Frame(bottom_right_frame)
+statsFrame.pack(fill="both")
 
-averageProbabilityLabel = tk.Label(updateRecordsFrame, text="Average Probability:")
-averageProbabilityLabel.grid(row=5, column=0)
-averageProbabilityValue = tk.Label(updateRecordsFrame, text="0")
-averageProbabilityValue.grid(row=5, column=1)
+rating_label = tk.Label(statsFrame, text="Rating:")
+rating_label.grid(row=1, column=0)
+rating_value = tk.Label(statsFrame, text="0")
+rating_value.grid(row=1, column=1)
 
-averageCostLabel = tk.Label(updateRecordsFrame, text="Average Cost:")
-averageCostLabel.grid(row=6, column=0)
-averageCostValue = tk.Label(updateRecordsFrame, text="0")
-averageCostValue.grid(row=6, column=1)
+rating_label_raw = tk.Label(statsFrame, text="Rating (Raw):")
+rating_label_raw.grid(row=1, column=2)
+rating_value_raw = tk.Label(statsFrame, text="0")
+rating_value_raw.grid(row=1, column=3)
 
+average_probability_label = tk.Label(statsFrame, text="Average Probability:")
+average_probability_label.grid(row=2, column=0)
+average_probability_value = tk.Label(statsFrame, text="0")
+average_probability_value.grid(row=2, column=1)
+
+average_cost_label = tk.Label(statsFrame, text="Average Cost:")
+average_cost_label.grid(row=3, column=0)
+average_cost_value = tk.Label(statsFrame, text="0")
+average_cost_value.grid(row=3, column=1)
+
+total_probability_label = tk.Label(statsFrame, text="Total Probability:")
+total_probability_label.grid(row=4, column=0)
+total_probability_value = tk.Label(statsFrame, text="0")
+total_probability_value.grid(row=4, column=1)
+
+total_cost_label = tk.Label(statsFrame, text="Total Cost:")
+total_cost_label.grid(row=5, column=0)
+total_cost_value = tk.Label(statsFrame, text="0")
+total_cost_value.grid(row=5, column=1)
+
+# calculate totals button
+calculate_totals_button = tk.Button(statsFrame, text="Calculate Totals", command=calculate_totals(rating_value, rating_value_raw, total_probability_value, total_cost_value, average_probability_value, average_cost_value))
+calculate_totals_button.grid(row=6, column=0, columnspan=4, sticky="ew")
 
 # ============================ BUTTONS ============================
 # set up buttons
-addButton = tk.Button(updateRecordsButtonsFrame, text="Add", command=add_node)
-addButton.grid(row=0, column=2, sticky="ew")
-updateButton = tk.Button(updateRecordsButtonsFrame, text="Update", command=update_node)
-updateButton.grid(row=0, column=0, sticky="ew")
-deleteButton = tk.Button(updateRecordsButtonsFrame, text="Delete", command=delete_node)
-deleteButton.grid(row=0, column=1, sticky="ew")
-loadButton = tk.Button(updateRecordsButtonsFrame, text="Load", command=load_from_yaml)
-loadButton.grid(row=1, column=0, sticky="ew")
-saveButton = tk.Button(updateRecordsButtonsFrame, text="Save", command=save_to_yaml)
-saveButton.grid(row=1, column=1, sticky="ew")
-# calculate totals button
-calculateTotalsButton = tk.Button(updateRecordsButtonsFrame, text="Calculate Totals", command=calculate_totals(totalProbabilityValue, totalCostValue, averageProbabilityValue, averageCostValue))
-calculateTotalsButton.grid(row=1, column=2, sticky="ew")
+add_button = tk.Button(update_records_button_frame, text="Add", command=add_node)
+add_button.grid(row=0, column=2, sticky="ew")
+update_button = tk.Button(update_records_button_frame, text="Update", command=update_node)
+update_button.grid(row=0, column=0, sticky="ew")
+delete_button = tk.Button(update_records_button_frame, text="Delete", command=delete_node)
+delete_button.grid(row=0, column=1, sticky="ew")
+load_button = tk.Button(update_records_button_frame, text="Load", command=load_from_yaml)
+load_button.grid(row=1, column=0, sticky="ew")
+save_button = tk.Button(update_records_button_frame, text="Save", command=save_to_yaml)
+save_button.grid(row=1, column=1, sticky="ew")
+
 # expand all nodes button
-expandAllButton = tk.Button(updateRecordsButtonsFrame, text="Expand All", command=expand_all_nodes)
-expandAllButton.grid(row=0, column=3, sticky="ew")
+expand_all_nodes_button = tk.Button(update_records_button_frame, text="Expand All", command=expand_all_nodes)
+expand_all_nodes_button.grid(row=0, column=3, sticky="ew")
 # collapse all nodes button
-collapseAllButton = tk.Button(updateRecordsButtonsFrame, text="Collapse All", command=collapse_all_nodes)
-collapseAllButton.grid(row=1, column=3, sticky="ew")
+collapse_all_nodes_button = tk.Button(update_records_button_frame, text="Collapse All", command=collapse_all_nodes)
+collapse_all_nodes_button.grid(row=1, column=3, sticky="ew")
 
 
 # ============================ EVENT BINDING/MISC ============================

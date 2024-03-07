@@ -240,17 +240,17 @@ def calculate_rating(probability_avg, cost_avg):
     """Calculate totally arbitrary rating of the attack tree based on the sum of the average probability and cost divided by 100."""
     rating_raw = math.ceil(probability_avg + cost_avg / 100)
     rating_letter = 'X'
-    if rating_raw >= 0:
+    if rating_raw >= 0 and rating_raw <= 499:
         rating_letter = 'AA'
-    elif rating_raw >= 500:
+    elif rating_raw >= 500 and rating_raw <= 999:
         rating_letter = 'A'
-    elif rating_raw <= 1000:
+    elif rating_raw >= 1000 and rating_raw <= 1499:
         rating_letter = 'B'
-    elif rating_raw >= 1500:
+    elif rating_raw >= 1500 and rating_raw <= 2499:
         rating_letter = 'C'
-    elif rating_raw >= 2500:
+    elif rating_raw >= 2500 and rating_raw <= 3999:
         rating_letter = 'D'
-    elif rating_raw >= 4000:
+    elif rating_raw >= 4000 and rating_raw <= 7999:
         rating_letter = 'E'
     elif rating_raw >= 8000:
         rating_letter = 'F'
